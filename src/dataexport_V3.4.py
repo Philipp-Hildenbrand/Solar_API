@@ -17,8 +17,8 @@ class Dataexport():
         self.counter = 0
 
         # Konfiguration
-        self.solar_ip1 = "192.168.178.35"
-        self.solar_ip2 = "192.168.250.181"
+        self.solar_ip1 = "ip"
+        self.solar_ip2 = "ip"
         self.heizon = -6500
         self.heizoff = -100
 
