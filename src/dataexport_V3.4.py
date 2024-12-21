@@ -21,15 +21,16 @@ logging.basicConfig(level=logging.DEBUG)
 # Configurations
 class Dataexport():
     def __init__(self,
-                 offset: float,
-                 heiz: bool = False,
-                 skip: bool = False,
                  delay: int = 2,
-                 intervall: int = 5):
-        self.heiz = heiz
-        self.skip = skip
-        self.offset = offset
-        print(f"Beginn offset {self.offset}")
+                 intervall: int = 5,
+                 solar_ip1: str = "192.168.178.35",
+                 solar_ip2: str = "",
+                 heizon: int = -6500,
+                 heizoff: int = -100,
+                 g_length: int = 9):
+        self.heiz = False
+        self.skip = False
+        self.offset = time.time()
         self.delay = delay
         self.intervall = intervall
         self.load = 0
@@ -37,17 +38,19 @@ class Dataexport():
         self.g_akku = 0
         self.g_netz = 0
         self.soc = 0
-        self.counter = 0
+        self.counter = -1
+        self.g_length = g_length
 
-        self.solar_ip1 = "ip"
-        self.solar_ip2 = "ip"
-        self.heizon = -6500
-        self.heizoff = -100
+        self.solar_ip1 = solar_ip1
+        self.solar_ip2 = solar_ip2
+        self.heizon = heizon
+        self.heizoff = heizoff
 
         self.netz_values = []
         self.akku_values = []
         self.logger = logging.getLogger("API_Logger")
 
+        self.power_data = None
 
     def get_data_from_url(self, ip, endpoint):
         """Ruft Daten von einer URL ab und gibt sie als JSON zurück. Gibt None zurück bei Fehler."""
@@ -55,6 +58,10 @@ class Dataexport():
         try:
             response = requests.get(url, timeout=5)
             response.raise_for_status()
-            return response.json()
+            self.power_data = response.json()
         except requests.RequestException as e:
-            return None
+            self.logger.error(f"Erroor {e}")
+
+if __name__ == "__main__":
+    api = Dataexport(offset=time.time())
+    api.get_data_from_url(ip = api.solar_ip1, endpoint = "solar_api/v1/GetPowerFlowRealtimeData.fcgi")
